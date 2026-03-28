@@ -13,3 +13,5 @@
 
 待观察
 - 20260328: 若用户继续报告游戏内不显示或保存无效，优先排查是否存在旧管理员实例截流单实例命令。
+
+- 20260328: BIOS/EC investigation complete: Colorful HX public page has no BIOS, Clevo mirror B10723 and EC10708 downloaded, B10724 entry present but unavailable.

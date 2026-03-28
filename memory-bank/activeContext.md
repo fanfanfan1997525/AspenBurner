@@ -8,3 +8,5 @@
 - 20260328: 已补 `Reset`、推荐预设、小绿十字/小黄十字/黄 T 字，并保留 CPU 角标设置。
 - 20260328: 已补窗体初始化回归测试，修掉预设说明标签初始化顺序导致的 NRE。
 - 20260328: 下一步若用户继续反馈“保存不生效”，先查是否仍在使用旧管理员实例或旧快捷方式。
+
+- 20260328: BIOS/EC research: matched Clevo NPxxSNx(-G) baseline, downloaded B10723 + EC10708, confirmed B10724 listing exists but source file is missing.
