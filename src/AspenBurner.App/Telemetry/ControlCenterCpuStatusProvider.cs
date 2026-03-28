@@ -24,14 +24,18 @@ public sealed class ControlCenterCpuStatusProvider : ICpuStatusProvider
     {
         try
         {
-            (string? assemblyPath, string? resolvedNativeDirectory) = FindInstallPaths();
-            if (string.IsNullOrWhiteSpace(assemblyPath))
+            ControlCenterRuntimePaths? installPaths = ControlCenterRuntimeLocator.FindInstallPaths();
+            if (installPaths is null)
             {
                 return;
             }
 
-            this.assemblyDirectory = Path.GetDirectoryName(assemblyPath);
-            this.nativeDirectory = resolvedNativeDirectory;
+            ControlCenterRuntimePaths cachedPaths = ControlCenterRuntimeCache.Prepare(
+                installPaths,
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
+            this.assemblyDirectory = Path.GetDirectoryName(cachedPaths.AssemblyPath);
+            this.nativeDirectory = cachedPaths.NativeDirectory;
 
             if (!string.IsNullOrWhiteSpace(this.nativeDirectory))
             {
@@ -41,7 +45,7 @@ public sealed class ControlCenterCpuStatusProvider : ICpuStatusProvider
             this.resolveHandler = this.ResolveAssembly;
             AppDomain.CurrentDomain.AssemblyResolve += this.resolveHandler;
 
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
+            Assembly assembly = Assembly.LoadFrom(cachedPaths.AssemblyPath);
             Type? cpuType = assembly.GetType("CC40.PageSystemElement.Interface_CPU", throwOnError: false);
             if (cpuType is null)
             {
@@ -102,38 +106,6 @@ public sealed class ControlCenterCpuStatusProvider : ICpuStatusProvider
         {
             AppDomain.CurrentDomain.AssemblyResolve -= this.resolveHandler;
         }
-    }
-
-    private static (string? AssemblyPath, string? NativeDirectory) FindInstallPaths()
-    {
-        string windowsAppsDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-            "WindowsApps");
-
-        string? assemblyPath = null;
-        try
-        {
-            assemblyPath = Directory
-                .EnumerateDirectories(windowsAppsDirectory, "CLEVOCO.FnhotkeysandOSD_*", SearchOption.TopDirectoryOnly)
-                .OrderByDescending(static path => path, StringComparer.OrdinalIgnoreCase)
-                .Select(static path => Path.Combine(path, "FnKey", "CC40", "CC40.exe"))
-                .FirstOrDefault(File.Exists);
-        }
-        catch
-        {
-            assemblyPath = null;
-        }
-
-        string? nativeDirectory = new[]
-        {
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "ControlCenter", "DCHU"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "ControlCenter", "DCHU"),
-            assemblyPath is null ? null : Path.Combine(Directory.GetParent(Directory.GetParent(Path.GetDirectoryName(assemblyPath)!)!.FullName)!.FullName, "DCHU"),
-        }
-        .Where(static path => !string.IsNullOrWhiteSpace(path))
-        .FirstOrDefault(static path => Directory.Exists(path!));
-
-        return (assemblyPath, nativeDirectory);
     }
 
     private Assembly? ResolveAssembly(object? sender, ResolveEventArgs args)
