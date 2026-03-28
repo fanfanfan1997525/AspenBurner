@@ -12,7 +12,7 @@ namespace AspenBurner.App.Application;
 /// </summary>
 public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms.ApplicationContext
 {
-    private readonly string configPath;
+    private string configPath;
     private readonly CrosshairConfigService configService;
     private readonly AppLogger logger;
     private readonly OverlayRuntime overlayRuntime;
@@ -33,7 +33,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
     /// </summary>
     public AspenBurnerApplicationContext(string configPath, AppCommand? initialCommand = null)
     {
-        this.configPath = configPath ?? throw new ArgumentNullException(nameof(configPath));
+        this.configPath = Path.GetFullPath(configPath ?? throw new ArgumentNullException(nameof(configPath)));
         this.configService = new CrosshairConfigService();
 
         string repositoryRoot = Directory.GetParent(Path.GetDirectoryName(configPath) ?? configPath)?.FullName
@@ -170,6 +170,11 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
 
         this.uiInvoker.BeginInvoke(new Action(() =>
         {
+            if (command.Kind != AppCommandKind.Stop)
+            {
+                this.ReloadConfigFrom(command.ConfigPath);
+            }
+
             switch (command.Kind)
             {
                 case AppCommandKind.ShowSettings:
@@ -240,6 +245,32 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
         {
             this.logger.Error("Failed to save configuration.", exception);
             this.settingsForm.SetFeedback($"保存失败：{exception.Message}", isError: true);
+        }
+    }
+
+    private void ReloadConfigFrom(string? requestedConfigPath)
+    {
+        string resolvedConfigPath = Path.GetFullPath(string.IsNullOrWhiteSpace(requestedConfigPath) ? this.configPath : requestedConfigPath);
+
+        try
+        {
+            CrosshairConfig loadedConfig = this.configService.LoadFromFile(resolvedConfigPath);
+            if (string.Equals(this.configPath, resolvedConfigPath, StringComparison.OrdinalIgnoreCase) &&
+                loadedConfig == this.currentConfig)
+            {
+                return;
+            }
+
+            this.configPath = resolvedConfigPath;
+            this.currentConfig = loadedConfig;
+            this.overlayRuntime.UpdateConfig(loadedConfig);
+            this.settingsForm.SetConfig(loadedConfig);
+            this.logger.Info($"Configuration reloaded from {resolvedConfigPath}.");
+        }
+        catch (Exception exception)
+        {
+            this.logger.Error("Failed to reload configuration.", exception);
+            this.settingsForm.SetFeedback($"重载配置失败：{exception.Message}", isError: true);
         }
     }
 

@@ -20,8 +20,8 @@ function Get-AspenBurnerExecutablePath {
     )
 
     $candidates = @(
-        (Join-Path $RootPath 'dist\AspenBurner\AspenBurner.exe')
         (Join-Path $RootPath 'src\AspenBurner.App\bin\Release\net8.0-windows\AspenBurner.exe')
+        (Join-Path $RootPath 'dist\AspenBurner\AspenBurner.exe')
         (Join-Path $RootPath 'src\AspenBurner.App\bin\Debug\net8.0-windows\AspenBurner.exe')
     )
 

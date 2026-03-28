@@ -66,6 +66,21 @@ public sealed class AppCommandCodecTests
     }
 
     /// <summary>
+    /// Ensures config paths survive transport to the primary instance.
+    /// </summary>
+    [TestMethod]
+    public void SerializeAndParse_RoundTripsConfigPath()
+    {
+        AppCommand command = new(AppCommandKind.Resume, 0, @"F:\software\crosshair-overlay\config\crosshair.json");
+
+        string payload = AppCommandCodec.Serialize(command);
+        AppCommand parsed = AppCommandCodec.Parse(payload);
+
+        Assert.AreEqual(AppCommandKind.Resume, parsed.Kind);
+        Assert.AreEqual(@"F:\software\crosshair-overlay\config\crosshair.json", parsed.ConfigPath);
+    }
+
+    /// <summary>
     /// Ensures malformed payloads are rejected.
     /// </summary>
     [TestMethod]

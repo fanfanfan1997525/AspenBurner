@@ -31,4 +31,4 @@ if ($Elevated -and -not (Test-IsAdministrator)) {
 }
 
 $executablePath = Get-AspenBurnerExecutablePath -RootPath $PSScriptRoot
-Start-Process -FilePath $executablePath -ArgumentList @('-ConfigPath', $resolvedConfigPath, '--resume') | Out-Null
+Start-Process -FilePath $executablePath -ArgumentList @('--config-path', $resolvedConfigPath, '--resume') | Out-Null

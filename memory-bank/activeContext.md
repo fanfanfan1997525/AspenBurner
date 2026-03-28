@@ -1,9 +1,7 @@
 # 当前上下文
-版本: v0.5.0
+版本: v0.5.1
 
-- 20260328: 用户要求把 AspenBurner 从脚本工具产品化为专门软件，并在本轮内完成方案、审议、实现、自验与交付。
-- 20260328: 已写入仓库级 `AGENTS.md`，锁定“先方案、再审议、后实现、完成前不互动”的执行纪律。
-- 20260328: 已安装并使用 `superpowers` 相关 skills，完成产品审计、设计方案、实施计划与多模型审议。
-- 20260328: 已完成 C# WinForms 桌面主程序 `AspenBurner.exe`，包含单实例、托盘、实时预览、设置窗、桌面预览、兼容脚本壳层。
-- 20260328: 已补充 `AspenBurner.Cli.ps1/.cmd` 自动化入口，并完成 opencli 自验。
-- 20260328: 当前进入最终交付阶段，只剩结果汇总与最终说明。
+- 20260328: 热修兼容入口无 CPU 角标。根因有二：兼容脚本仍传 `-ConfigPath`，桌面运行时只认 `--config-path`；单实例二次启动只发 `resume`，旧主进程不会重载磁盘配置。
+- 20260328: 已补 `AppLaunchRequestParser` 和命令链回归测试，兼容 `-ConfigPath/--config-path`，并让 `AppCommand` 可携带配置路径。
+- 20260328: 主进程收到远程 `resume/show-settings/preview/health` 前会先按磁盘配置重载；兼容脚本已改为统一传 `--config-path`。
+- 20260328: `dotnet test` 41/41 通过，PowerShell 脚本语法检查通过，Release 构建成功。旧管理员实例仍在运行，替换 `dist` 发布物需用户确认 UAC 关闭旧进程后再重启。

@@ -14,12 +14,13 @@ internal static class Program
     {
         ApplicationConfiguration.Initialize();
 
-        (AppCommand? initialCommand, string configPath) = ParseArguments(args);
+        AppLaunchRequest launchRequest = AppLaunchRequestParser.Parse(args, GetDefaultConfigPath());
+        AppCommand? initialCommand = launchRequest.Command;
         using Mutex mutex = new(initiallyOwned: true, AppIdentity.MutexName, out bool createdNew);
 
         if (!createdNew)
         {
-            AppCommand command = initialCommand ?? new AppCommand(AppCommandKind.Resume);
+            AppCommand command = initialCommand ?? new AppCommand(AppCommandKind.Resume, 0, launchRequest.ConfigPath);
             AppCommandClient client = new();
             _ = client.TrySend(AppIdentity.PipeName, command);
             return;
@@ -30,66 +31,9 @@ internal static class Program
             return;
         }
 
-        AppCommand startupCommand = initialCommand ?? new AppCommand(AppCommandKind.Resume);
-        using AspenBurnerApplicationContext context = new(configPath, startupCommand);
+        AppCommand startupCommand = initialCommand ?? new AppCommand(AppCommandKind.Resume, 0, launchRequest.ConfigPath);
+        using AspenBurnerApplicationContext context = new(launchRequest.ConfigPath, startupCommand);
         global::System.Windows.Forms.Application.Run(context);
-    }
-
-    private static (AppCommand? Command, string ConfigPath) ParseArguments(string[] args)
-    {
-        AppCommand? command = null;
-        int previewSeconds = 8;
-        string configPath = GetDefaultConfigPath();
-
-        for (int i = 0; i < args.Length; i++)
-        {
-            string argument = args[i].Trim();
-            switch (argument.ToLowerInvariant())
-            {
-                case "--config-path":
-                    configPath = Path.GetFullPath(args[++i]);
-                    break;
-                case "--command":
-                    command = ParseCommandValue(args[++i], previewSeconds);
-                    break;
-                case "--preview-seconds":
-                    previewSeconds = int.Parse(args[++i], CultureInfo.InvariantCulture);
-                    if (command?.Kind == AppCommandKind.Preview)
-                    {
-                        command = new AppCommand(AppCommandKind.Preview, previewSeconds);
-                    }
-
-                    break;
-                case "--show-settings":
-                    command = new AppCommand(AppCommandKind.ShowSettings);
-                    break;
-                case "--preview":
-                    command = new AppCommand(AppCommandKind.Preview, previewSeconds);
-                    break;
-                case "--stop":
-                    command = new AppCommand(AppCommandKind.Stop);
-                    break;
-                case "--start":
-                case "--resume":
-                    command = new AppCommand(AppCommandKind.Resume);
-                    break;
-            }
-        }
-
-        return (command, configPath);
-    }
-
-    private static AppCommand ParseCommandValue(string value, int previewSeconds)
-    {
-        return value.ToLowerInvariant() switch
-        {
-            "show-settings" => new AppCommand(AppCommandKind.ShowSettings),
-            "preview" => new AppCommand(AppCommandKind.Preview, previewSeconds),
-            "health" => new AppCommand(AppCommandKind.Health),
-            "resume" => new AppCommand(AppCommandKind.Resume),
-            "stop" => new AppCommand(AppCommandKind.Stop),
-            _ => throw new ArgumentException($"Unknown command argument: {value}", nameof(value)),
-        };
     }
 
     private static string GetDefaultConfigPath()
