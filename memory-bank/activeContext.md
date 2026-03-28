@@ -12,3 +12,7 @@
 - 20260328: BIOS/EC research: matched Clevo NPxxSNx(-G) baseline, downloaded B10723 + EC10708, confirmed B10724 listing exists but source file is missing.
 
 - 20260329: Firmware rollback status: BIOS now 1.07.23 and EC 7.08, but Event 37 persists and Win32_Processor still reports 2100/2100 MHz; root cause not resolved by firmware version rollback alone.
+
+- 20260329: 新增 CPU 验证工具 AspenBurner.Bench，已完成主线程帧循环、多核吞吐、遥测采样、Event 37 探针与文本报告。
+- 20260329: Bench 正式实测 75s，AverageFrequencyMHz=3534、MaxFrequencyMHz=4518、PeakTemperatureC=87、Event37Delta=0，结论为‘正常’。
+

@@ -12,13 +12,14 @@ public static class BenchWorkloads
     /// </summary>
     public static long RunFrameWorkload(int workerCount)
     {
-        long total = RunKernel(22_000, 1);
-        if (workerCount > 1)
+        int frameWorkers = Math.Min(Math.Max(workerCount, 1), 6);
+        long total = RunKernel(180_000, 1);
+        if (frameWorkers > 1)
         {
             object gate = new();
-            Parallel.For(0, workerCount - 1, new ParallelOptions { MaxDegreeOfParallelism = workerCount - 1 }, workerIndex =>
+            Parallel.For(0, frameWorkers - 1, new ParallelOptions { MaxDegreeOfParallelism = frameWorkers - 1 }, workerIndex =>
             {
-                long local = RunKernel(8_000, workerIndex + 10);
+                long local = RunKernel(50_000, workerIndex + 10);
                 lock (gate)
                 {
                     total += local;

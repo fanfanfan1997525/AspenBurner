@@ -17,3 +17,7 @@
 - 20260328: BIOS/EC investigation complete: Colorful HX public page has no BIOS, Clevo mirror B10723 and EC10708 downloaded, B10724 entry present but unavailable.
 
 - 20260329: Verified BIOS single-flash and EC update succeeded (BIOS 1.07.23, EC 7.08), but firmware throttling persists with fresh Event 37 and CPU capped at 2100 MHz.
+
+- 20260329: 完成 AspenBurner.Bench CPU 验证工具，新增 bench 项目、测试项目、两段负载场景、遥测采样、Event 37 探针和结论分类。
+- 20260329: Bench 全量测试通过，并完成本机 75s 正式验证，结果未出现新的 Event 37，当前机器在该工具下表现正常。
+
