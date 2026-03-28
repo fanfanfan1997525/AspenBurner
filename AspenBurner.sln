@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6E1BEAF8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspenBurner.App.Tests", "tests\AspenBurner.App.Tests\AspenBurner.App.Tests.csproj", "{93D20C2F-7BCD-4A84-846D-E85B60CA0D77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspenBurner.Bench", "src\AspenBurner.Bench\AspenBurner.Bench.csproj", "{5F87CB1F-27FE-4961-9B90-3EBF77829F8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspenBurner.Bench.Tests", "tests\AspenBurner.Bench.Tests\AspenBurner.Bench.Tests.csproj", "{F12B5F9C-A49E-42D2-A009-7F1DA6A95A47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,9 +32,19 @@ Global
 		{93D20C2F-7BCD-4A84-846D-E85B60CA0D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93D20C2F-7BCD-4A84-846D-E85B60CA0D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93D20C2F-7BCD-4A84-846D-E85B60CA0D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F87CB1F-27FE-4961-9B90-3EBF77829F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F87CB1F-27FE-4961-9B90-3EBF77829F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F87CB1F-27FE-4961-9B90-3EBF77829F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F87CB1F-27FE-4961-9B90-3EBF77829F8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F12B5F9C-A49E-42D2-A009-7F1DA6A95A47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F12B5F9C-A49E-42D2-A009-7F1DA6A95A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F12B5F9C-A49E-42D2-A009-7F1DA6A95A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F12B5F9C-A49E-42D2-A009-7F1DA6A95A47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B6B184E7-5766-48F3-9558-BE7D66D280F1} = {3364DB4D-AC56-48C5-8055-C418F1500E96}
 		{93D20C2F-7BCD-4A84-846D-E85B60CA0D77} = {6E1BEAF8-A6AD-41AB-8C66-34FA784167BA}
+		{5F87CB1F-27FE-4961-9B90-3EBF77829F8D} = {3364DB4D-AC56-48C5-8055-C418F1500E96}
+		{F12B5F9C-A49E-42D2-A009-7F1DA6A95A47} = {6E1BEAF8-A6AD-41AB-8C66-34FA784167BA}
 	EndGlobalSection
 EndGlobal
