@@ -16,3 +16,5 @@
 - 20260329: 新增 CPU 验证工具 AspenBurner.Bench，已完成主线程帧循环、多核吞吐、遥测采样、Event 37 探针与文本报告。
 - 20260329: Bench 正式实测 75s，AverageFrequencyMHz=3534、MaxFrequencyMHz=4518、PeakTemperatureC=87、Event37Delta=0，结论为‘正常’。
 
+
+- 20260329: Bench 75s on Performance + custom fan + dGPU only => AvgFreq=3931MHz, PeakTemp=98C, Event37Delta=0, conclusion=normal.

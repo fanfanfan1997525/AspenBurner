@@ -21,3 +21,5 @@
 - 20260329: 完成 AspenBurner.Bench CPU 验证工具，新增 bench 项目、测试项目、两段负载场景、遥测采样、Event 37 探针和结论分类。
 - 20260329: Bench 全量测试通过，并完成本机 75s 正式验证，结果未出现新的 Event 37，当前机器在该工具下表现正常。
 
+
+- 20260329: Added comparison datapoint for Performance + custom fan + dGPU only; 75s bench remained normal with AvgFreq=3931MHz, PeakTemp=98C, Event37Delta=0.
