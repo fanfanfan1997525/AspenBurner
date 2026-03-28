@@ -23,3 +23,5 @@
 
 
 - 20260329: Added comparison datapoint for Performance + custom fan + dGPU only; 75s bench remained normal with AvgFreq=3931MHz, PeakTemp=98C, Event37Delta=0.
+
+- 20260329: Added external-fan comparison datapoint; same profile stayed normal, with better FrameLoop P95 and multi-core throughput despite same 98C peak.
