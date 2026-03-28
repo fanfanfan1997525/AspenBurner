@@ -74,6 +74,38 @@ public sealed class CpuStatusServiceTests
         Assert.AreEqual(TelemetryFreshnessState.Stale, freshness);
     }
 
+    /// <summary>
+    /// Ensures provider failures degrade gracefully to fallback data instead of crashing the runtime.
+    /// </summary>
+    [TestMethod]
+    public void Capture_FallsBackWhenPreferredProviderThrows()
+    {
+        using CpuStatusService service = new(
+            new ThrowingProvider(),
+            new FakeProvider(new CpuStatusSnapshot(3185, null, false, "Fallback", DateTimeOffset.Now)));
+
+        CpuStatusSnapshot snapshot = service.Capture();
+
+        Assert.AreEqual(3185, snapshot.FrequencyMHz);
+        Assert.IsNull(snapshot.TemperatureC);
+        Assert.AreEqual("Fallback", snapshot.Source);
+    }
+
+    /// <summary>
+    /// Ensures double-provider failure reports unavailable telemetry without throwing.
+    /// </summary>
+    [TestMethod]
+    public void Capture_ReturnsUnavailableWhenBothProvidersThrow()
+    {
+        using CpuStatusService service = new(new ThrowingProvider(), new ThrowingProvider());
+
+        CpuStatusSnapshot snapshot = service.Capture();
+
+        Assert.AreEqual(0, snapshot.FrequencyMHz);
+        Assert.IsNull(snapshot.TemperatureC);
+        Assert.AreEqual("Unavailable", snapshot.Source);
+    }
+
     private sealed class FakeProvider : ICpuStatusProvider
     {
         private readonly CpuStatusSnapshot snapshot;
@@ -86,6 +118,18 @@ public sealed class CpuStatusServiceTests
         public CpuStatusSnapshot Capture()
         {
             return this.snapshot with { CapturedAt = DateTimeOffset.Now };
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    private sealed class ThrowingProvider : ICpuStatusProvider
+    {
+        public CpuStatusSnapshot Capture()
+        {
+            throw new InvalidOperationException("provider failure");
         }
 
         public void Dispose()

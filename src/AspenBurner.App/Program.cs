@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Threading;
 using AspenBurner.App.Application;
+using AspenBurner.App.Diagnostics;
 
 namespace AspenBurner.App;
 
@@ -15,6 +16,7 @@ internal static class Program
         ApplicationConfiguration.Initialize();
 
         AppLaunchRequest launchRequest = AppLaunchRequestParser.Parse(args, GetDefaultConfigPath());
+        ApplicationExceptionMonitor.Register(CreateBootstrapLogger(launchRequest.ConfigPath));
         AppCommand? initialCommand = launchRequest.Command;
         using Mutex mutex = new(initiallyOwned: true, AppIdentity.MutexName, out bool createdNew);
 
@@ -47,5 +49,13 @@ internal static class Program
             : File.Exists(parentConfigPath) || Directory.Exists(Path.GetDirectoryName(parentConfigPath)!)
                 ? parentConfigPath
                 : grandParentConfigPath;
+    }
+
+    private static AppLogger CreateBootstrapLogger(string configPath)
+    {
+        string resolvedConfigPath = Path.GetFullPath(configPath);
+        string repositoryRoot = Directory.GetParent(Path.GetDirectoryName(resolvedConfigPath) ?? resolvedConfigPath)?.FullName
+            ?? AppContext.BaseDirectory;
+        return new AppLogger(Path.Combine(repositoryRoot, "logs"));
     }
 }

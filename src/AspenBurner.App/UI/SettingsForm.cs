@@ -17,7 +17,9 @@ public sealed class SettingsForm : Form
     private readonly Label telemetryFreshnessLabel;
     private readonly Label liveStatusLabel;
     private readonly Label feedbackLabel;
+    private readonly Label presetDescriptionLabel;
     private readonly ComboBox colorComboBox;
+    private readonly ComboBox presetComboBox;
     private readonly ComboBox statusPositionComboBox;
     private readonly ComboBox statusColorComboBox;
     private readonly SliderRow colorRRow;
@@ -196,17 +198,61 @@ public sealed class SettingsForm : Form
         {
             Text = "动作",
             Width = 520,
-            Height = 130,
+            Height = 182,
         };
         FlowLayoutPanel buttonFlow = new()
         {
             Dock = DockStyle.Fill,
             Padding = new Padding(12),
         };
+        this.presetComboBox = new ComboBox
+        {
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Width = 220,
+            DisplayMember = nameof(CrosshairPresetDefinition.DisplayName),
+        };
+        this.presetComboBox.SelectedIndexChanged += (_, _) => this.UpdatePresetDescription();
+        this.presetDescriptionLabel = new Label
+        {
+            AutoSize = false,
+            Width = 360,
+            Height = 38,
+            Location = new Point(96, 38),
+            ForeColor = Color.DimGray,
+        };
+        foreach (CrosshairPresetDefinition preset in CrosshairPresetCatalog.GetRecommendations())
+        {
+            this.presetComboBox.Items.Add(preset);
+        }
+
+        Panel presetRow = new()
+        {
+            Width = 470,
+            Height = 76,
+            Margin = new Padding(0, 0, 0, 8),
+        };
+        Label presetLabel = new()
+        {
+            Text = "推荐参数",
+            Location = new Point(0, 8),
+            Width = 90,
+        };
+        this.presetComboBox.Location = new Point(96, 4);
+        Button applyPresetButton = CreateButton("应用预设", (_, _) => this.ApplySelectedPreset());
+        applyPresetButton.Location = new Point(328, 0);
+        presetRow.Controls.Add(presetLabel);
+        presetRow.Controls.Add(this.presetComboBox);
+        presetRow.Controls.Add(applyPresetButton);
+        presetRow.Controls.Add(this.presetDescriptionLabel);
+        if (this.presetComboBox.Items.Count > 0)
+        {
+            this.presetComboBox.SelectedIndex = 0;
+        }
         Button saveButton = CreateButton("保存配置", (_, _) => this.SaveRequested?.Invoke(this, EventArgs.Empty));
-        Button resetButton = CreateButton("恢复默认", (_, _) => this.UpdateConfig(new CrosshairConfig()));
+        Button resetButton = CreateButton("恢复默认", (_, _) => this.ResetToDefaults());
         Button previewButton = CreateButton("桌面预览 8 秒", (_, _) => this.PreviewRequested?.Invoke(this, EventArgs.Empty));
         Button exitButton = CreateButton("退出程序", (_, _) => this.ExitRequested?.Invoke(this, EventArgs.Empty));
+        buttonFlow.Controls.Add(presetRow);
         buttonFlow.Controls.Add(saveButton);
         buttonFlow.Controls.Add(resetButton);
         buttonFlow.Controls.Add(previewButton);
@@ -230,6 +276,7 @@ public sealed class SettingsForm : Form
         this.Controls.Add(splitContainer);
 
         this.SetConfig(this.currentConfig);
+        this.UpdatePresetDescription();
     }
 
     /// <summary>
@@ -473,6 +520,7 @@ public sealed class SettingsForm : Form
             Maximum = maximum,
             Width = 78,
             Location = new Point(350, 20),
+            TextAlign = HorizontalAlignment.Center,
         };
 
         trackBar.ValueChanged += (_, _) =>
@@ -535,6 +583,7 @@ public sealed class SettingsForm : Form
             Maximum = maximum,
             Width = 90,
             Location = new Point(128, 6),
+            TextAlign = HorizontalAlignment.Center,
         };
         numeric.ValueChanged += (_, _) =>
         {
@@ -599,8 +648,7 @@ public sealed class SettingsForm : Form
         }
 
         this.SetConfig(config);
-        this.feedbackLabel.Text = "已应用到预览，等待自动保存。";
-        this.feedbackLabel.ForeColor = Color.DarkGoldenrod;
+        this.SetFeedback("已应用到实际准心，等待自动保存。");
         this.ConfigEdited?.Invoke(this, config);
     }
 
@@ -632,6 +680,30 @@ public sealed class SettingsForm : Form
         });
         this.ConfigEdited?.Invoke(this, this.currentConfig);
         this.SetFeedback("角标位置已更新。");
+    }
+
+    private void ApplySelectedPreset()
+    {
+        if (this.presetComboBox.SelectedItem is not CrosshairPresetDefinition preset)
+        {
+            return;
+        }
+
+        this.UpdateConfig(CrosshairPresetCatalog.Apply(preset.Id, this.currentConfig));
+        this.SetFeedback($"已应用推荐参数：{preset.DisplayName}。");
+    }
+
+    private void ResetToDefaults()
+    {
+        this.UpdateConfig(CrosshairPresetCatalog.Reset());
+        this.SetFeedback("已恢复默认参数。");
+    }
+
+    private void UpdatePresetDescription()
+    {
+        this.presetDescriptionLabel.Text = this.presetComboBox.SelectedItem is CrosshairPresetDefinition preset
+            ? preset.Description
+            : "选择推荐参数后可一键套用。";
     }
 
     private readonly record struct SliderRow(Panel Panel, Label Label, TrackBar TrackBar, NumericUpDown Numeric)

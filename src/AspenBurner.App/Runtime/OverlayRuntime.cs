@@ -79,7 +79,7 @@ public sealed class OverlayRuntime : IDisposable
         this.currentConfig = config ?? throw new ArgumentNullException(nameof(config));
         this.crosshairForm.ApplyConfig(config);
         this.lastStatusRefreshAt = DateTimeOffset.MinValue;
-        this.PublishHealth();
+        this.OnStateTick(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -145,6 +145,18 @@ public sealed class OverlayRuntime : IDisposable
     }
 
     private void OnStateTick(object? sender, EventArgs e)
+    {
+        try
+        {
+            this.OnStateTickCore();
+        }
+        catch (Exception exception)
+        {
+            this.HandleStateTickFailure(exception);
+        }
+    }
+
+    private void OnStateTickCore()
     {
         DateTimeOffset now = DateTimeOffset.Now;
         bool previewActive = this.previewEndsAt > now;
@@ -220,6 +232,7 @@ public sealed class OverlayRuntime : IDisposable
     {
         if (!this.currentConfig.StatusEnabled)
         {
+            this.lastStatusText = string.Empty;
             this.statusForm.Hide();
             this.telemetryFreshness = this.cpuStatusService.GetFreshness(now);
             return;
@@ -297,6 +310,17 @@ public sealed class OverlayRuntime : IDisposable
     private void PublishHealth()
     {
         this.HealthChanged?.Invoke(this, this.BuildHealthSnapshot());
+    }
+
+    private void HandleStateTickFailure(Exception exception)
+    {
+        this.logger.Error("Overlay state tick failed.", exception);
+        this.previewEndsAt = DateTimeOffset.MinValue;
+        this.targetState = TargetWindowState.WaitingForTarget;
+        this.telemetryFreshness = this.cpuStatusService.GetFreshness(DateTimeOffset.Now);
+        this.lastTargetHandle = IntPtr.Zero;
+        this.HideAll();
+        this.PublishHealth();
     }
 
     private HealthSnapshot BuildHealthSnapshot()

@@ -32,16 +32,19 @@ public sealed class CpuStatusService : IDisposable
     /// </summary>
     public CpuStatusSnapshot Capture()
     {
-        CpuStatusSnapshot fallbackSnapshot = this.fallbackProvider.Capture();
-        CpuStatusSnapshot preferredSnapshot = this.preferredProvider.Capture();
+        CpuStatusSnapshot fallbackSnapshot = CaptureSafely(this.fallbackProvider);
+        CpuStatusSnapshot preferredSnapshot = CaptureSafely(this.preferredProvider);
 
         bool preferredHasSignal = preferredSnapshot.FrequencyMHz > 0 || preferredSnapshot.TemperatureC.HasValue;
+        bool fallbackHasSignal = fallbackSnapshot.FrequencyMHz > 0 || fallbackSnapshot.TemperatureC.HasValue;
         int frequencyMHz = preferredSnapshot.FrequencyMHz > 0
             ? preferredSnapshot.FrequencyMHz
             : fallbackSnapshot.FrequencyMHz;
         double? temperatureC = preferredSnapshot.TemperatureC;
         bool approximateTemperature = preferredHasSignal && preferredSnapshot.ApproximateTemperature;
-        string source = preferredHasSignal ? preferredSnapshot.Source : fallbackSnapshot.Source;
+        string source = preferredHasSignal
+            ? preferredSnapshot.Source
+            : fallbackHasSignal ? fallbackSnapshot.Source : "Unavailable";
         CpuStatusSnapshot merged = new(frequencyMHz, temperatureC, approximateTemperature, source, DateTimeOffset.Now);
 
         if (merged.FrequencyMHz > 0 || merged.TemperatureC.HasValue)
@@ -72,5 +75,17 @@ public sealed class CpuStatusService : IDisposable
     {
         this.preferredProvider.Dispose();
         this.fallbackProvider.Dispose();
+    }
+
+    private static CpuStatusSnapshot CaptureSafely(ICpuStatusProvider provider)
+    {
+        try
+        {
+            return provider.Capture();
+        }
+        catch
+        {
+            return new CpuStatusSnapshot(0, null, false, "Unavailable", DateTimeOffset.Now);
+        }
     }
 }
