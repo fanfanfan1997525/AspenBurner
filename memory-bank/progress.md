@@ -1,5 +1,5 @@
 # 项目进度
-版本: v0.4.3
+版本: v0.4.4
 
 已完成
 - 20260326: 建立 `crosshair-overlay` 独立工具与 `memory-bank` 骨架。
@@ -11,14 +11,14 @@
 - 20260327: 完成首轮游戏环境优化，处理 Xbox Game Bar、NVIDIA App/Overlay 等干扰项。
 - 20260328: 增加 CPU 状态角标、可自定义准心配置、交互式设置面板与桌面快捷方式。
 - 20260328: 修复设置面板只影响预览不影响真实进程的问题，加入自动保存与配置热重载。
-- 20260328: 修复 CPU 状态口径：频率不再显示错误的 `1.9GHz`，温度不再显示 `TZ xxC` 伪值。
-- 20260328: 新增 Control Center vendor provider，角标现在优先读取控制中心真实 `Clock/Temperature/Usage`。
+- 20260328: 修复 CPU 状态口径，移除 `TZ` 伪值显示，优先显示真实温度。
+- 20260328: 新增 `Control Center` vendor provider，角标优先读取控制中心真实 `Clock/Temperature/Usage`。
 - 20260328: 新增 `Resolve-PreferredCpuStatusSnapshot`，解决 vendor 预热阶段时钟短暂回落到基频的问题。
 - 20260328: Pester `46/46` 通过；`CrosshairOverlay.ps1` smoke run 通过。
-- 20260328: 已初始化本地 git 仓库、重写 `README.md`、完成本地提交并合并远端 `main` 历史。
+- 20260328: 初始化本地 git 仓库，重写 `README.md`，完成本地提交并合并远端 `main` 历史。
+- 20260328: 成功推送到远端 `origin/main`，远端当前提交为 `12f2472`。
 
 未完成
-- 20260328: 远端 `origin/main` 尚未推送成功，当前阻塞为 GitHub 认证。
 - 20260328: 需要用户在真实游戏场景下验证新版角标是否已显示真实温度，且无明显性能干扰。
-- 20260328: 若用户仍需更低开销方案，可继续研究直接调用 `InsydeDCHU`/控制中心初始化链，绕开 `CC40` 托管层。
-- 20260328: 若用户希望可视化切换数据源，可在设置面板加入 `Vendor / Fallback` 状态显示。
+- 20260328: 若仍需更低开销方案，可继续研究直接调用 `InsydeDCHU` 初始化链，进一步绕开 `CC40` 托管层。
+- 20260328: 若需要更强可视化调试，可在设置面板加入 `Vendor / Fallback` 数据源状态显示。
