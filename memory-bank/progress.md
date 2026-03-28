@@ -25,3 +25,5 @@
 - 20260329: Added comparison datapoint for Performance + custom fan + dGPU only; 75s bench remained normal with AvgFreq=3931MHz, PeakTemp=98C, Event37Delta=0.
 
 - 20260329: Added external-fan comparison datapoint; same profile stayed normal, with better FrameLoop P95 and multi-core throughput despite same 98C peak.
+
+- 20260329: Added real-game monitoring result for Delta Force under Performance + Maximum; stable clocks and no Event37, but CPU remained near 98C for most combat samples and FPS capture via PresentMon still failed.

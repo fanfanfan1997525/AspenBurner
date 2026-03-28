@@ -20,3 +20,5 @@
 - 20260329: Bench 75s on Performance + custom fan + dGPU only => AvgFreq=3931MHz, PeakTemp=98C, Event37Delta=0, conclusion=normal.
 
 - 20260329: Bench 75s with external intake fan under Performance + custom fan + dGPU only => AvgFreq=3907MHz, PeakTemp=98C, P95=3.85ms, Parallel=904628396 ops/s, Event37Delta=0, conclusion=normal.
+
+- 20260329: Real-game session monitor (~10.5 min, Performance + Maximum) => Event37Delta=0, combat avg CPU freq=3812MHz, combat avg CPU temp=97.79C, combat avg GPU util=66.07%, combat avg GPU temp=78.83C; no PresentMon CSV, so direct FPS capture failed.
