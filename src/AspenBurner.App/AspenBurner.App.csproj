@@ -8,6 +8,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>App.manifest</ApplicationManifest>
     <RootNamespace>AspenBurner.App</RootNamespace>
+    <AssemblyName>AspenBurner</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
 
 </Project>

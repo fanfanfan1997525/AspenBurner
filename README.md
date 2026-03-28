@@ -1,50 +1,56 @@
 # AspenBurner
 
-版本: v0.4.3
+版本: v0.5.0  
+日期: 2026-03-28
 
-一个面向 Windows 的轻量准心与状态角标工具，主要为《三角洲行动》这类没有中心准心的游戏提供屏幕中心十字准心，并在角落显示 CPU 频率与温度。
+AspenBurner 现在是一个专门的 Windows 桌面软件，不再以 PowerShell 透明窗脚本作为主运行时。当前主程序为 `dist\AspenBurner\AspenBurner.exe`，保留 `Start/Configure/Stop` 脚本与 `.cmd` 入口作为兼容壳层。
 
-## 功能
+## 当前能力
 
-- 屏幕中心小尺寸十字准心
-- 支持自定义 `RGB`、长度、粗细、间距、透明度、偏移和四臂开关
-- 支持独立 CPU 状态角标
-- 优先读取 `Control Center` 的真实 `Clock / Temperature / Usage`
-- 失败时回退到通用 Windows 频率估算与可用直连传感器
-- 设置面板支持实时预览、滑块调节、数值输入和角标拖拽
-- 仅在目标游戏窗口前台时显示，避免常驻桌面干扰
+- 小型十字准心，支持 `RGB`、长度、粗细、间距、描边、透明度、中心偏移
+- 四臂开关，可组合为十字、T 形等样式
+- CPU 角标，支持位置锚点、边距、文字颜色、字号、刷新间隔
+- 左侧实时预览，支持拖动 CPU 角标调整位置
+- 托盘常驻，支持显示设置、桌面预览 8 秒、暂停显示、退出程序
+- 单实例运行，二次启动会转发命令到主实例
+- 兼容旧入口：
+  - `Start-Crosshair.cmd/.ps1`
+  - `Configure-Crosshair.cmd/.ps1`
+  - `Stop-Crosshair.cmd/.ps1`
+- 日志落盘到 `logs\`
 
 ## 目录
 
-- `CrosshairOverlay.ps1`: 主脚本
-- `Configure-Crosshair.ps1`: 设置面板
-- `Start-Crosshair.cmd`: 启动入口
-- `Stop-Crosshair.cmd`: 停止入口
-- `config/crosshair.json`: 配置文件
-- `src/CrosshairOverlay.Core.psm1`: 核心逻辑
-- `tests/tdd/crosshair_overlay/CrosshairOverlay.Tests.ps1`: Pester 测试
+- `dist\AspenBurner\AspenBurner.exe`: 已发布桌面程序
+- `src\AspenBurner.App\`: C# WinForms 主程序源码
+- `tests\AspenBurner.App.Tests\`: MSTest 自动化测试
+- `config\crosshair.json`: 兼容旧版的配置文件
+- `Start-Crosshair.cmd/.ps1`: 启动/恢复显示
+- `Configure-Crosshair.cmd/.ps1`: 打开设置窗口
+- `Stop-Crosshair.cmd/.ps1`: 请求主程序退出
+- `logs\`: 运行日志
 
-## 启动
+## 使用
 
-直接双击：
+推荐直接双击：
 
 - `Start-Crosshair.cmd`
 - `Configure-Crosshair.cmd`
 - `Stop-Crosshair.cmd`
 
-也可以用命令行：
+也可以直接运行发布物：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\Start-Crosshair.ps1
-powershell -ExecutionPolicy Bypass -File .\Configure-Crosshair.ps1
-powershell -ExecutionPolicy Bypass -File .\Stop-Crosshair.ps1
+.\dist\AspenBurner\AspenBurner.exe --config-path .\config\crosshair.json --resume
+.\dist\AspenBurner\AspenBurner.exe --config-path .\config\crosshair.json --show-settings
+.\dist\AspenBurner\AspenBurner.exe --stop
 ```
 
-如果游戏以管理员权限运行，启动和停止脚本会走提权链路；桌面弹出 UAC 时需要手动点“是”。
+如果游戏以管理员权限运行，兼容脚本会请求 UAC 提权。需要你在桌面确认一次。
 
 ## 配置
 
-配置文件位于 `config/crosshair.json`。常用字段：
+配置文件位于 `config\crosshair.json`。常用字段如下：
 
 ```json
 {
@@ -59,6 +65,10 @@ powershell -ExecutionPolicy Bypass -File .\Stop-Crosshair.ps1
   "Opacity": 250,
   "OffsetX": 0,
   "OffsetY": 0,
+  "ShowLeftArm": true,
+  "ShowRightArm": true,
+  "ShowTopArm": true,
+  "ShowBottomArm": true,
   "StatusEnabled": true,
   "StatusPosition": "TopRight",
   "StatusOffsetX": 60,
@@ -73,45 +83,54 @@ powershell -ExecutionPolicy Bypass -File .\Stop-Crosshair.ps1
 
 说明：
 
-- `Color`: `Green` / `Yellow` / `Custom`
+- `Color`: `Green / Yellow / Custom`
 - `ColorR/G/B`: 自定义颜色通道
-- `Length`: 准心单臂长度
+- `Length`: 单臂长度
 - `Gap`: 中心间距
 - `Thickness`: 线宽
-- `OutlineThickness`: 黑边宽度
-- `Opacity`: 透明度
-- `OffsetX/OffsetY`: 准心相对中心偏移
+- `OutlineThickness`: 描边宽度
+- `Opacity`: 准心透明度
+- `OffsetX/OffsetY`: 准心中心偏移
 - `ShowLeftArm/ShowRightArm/ShowTopArm/ShowBottomArm`: 四臂开关
-- `StatusEnabled`: 是否显示状态角标
+- `StatusEnabled`: 是否显示 CPU 角标
 - `StatusPosition`: `TopLeft / TopRight / BottomLeft / BottomRight`
+- `StatusOffsetX/StatusOffsetY`: 角标边距
+- `StatusRefreshMs`: 刷新间隔
 
-## 温度来源
+## 遥测
 
-当前版本优先使用笔记本官方 `Control Center` 的厂商链路读取 CPU 真实温度，而不是显示 `TZ` 热区近似值。
+CPU 遥测当前策略：
 
-读取顺序：
+1. 优先尝试 `Control Center`
+2. 失败时回退到 Windows 通用频率估算
+3. 没有可信温度时显示 `--C`，不再伪装成真实温度
 
-1. `Control Center` vendor provider
-2. 可用的直连硬件传感器
-3. Windows 通用频率回退
+界面会展示：
 
-因此，频率和温度可能会有瞬时波动，这是正常现象。
+- 数据来源
+- 鲜度状态 `Fresh / Stale / Unavailable`
+- 当前状态文本
 
-## 测试
+## 测试与发布
 
 运行测试：
 
 ```powershell
-Invoke-Pester -Path .\tests\tdd\crosshair_overlay\CrosshairOverlay.Tests.ps1
+dotnet test .\AspenBurner.sln
 ```
 
-当前基线：
+发布：
 
-- Pester `46/46` 通过
+```powershell
+dotnet publish .\src\AspenBurner.App\AspenBurner.App.csproj -c Release -o .\dist\AspenBurner
+```
 
-## 注意事项
+当前自动化基线：
 
-- 当前目标进程默认包含 `DeltaForceClient-Win64-Shipping` 和 `delta_force_launcher`
-- 准心与角标默认只在目标游戏前台显示
-- 如果游戏使用独占全屏，Windows 叠加层可能不可见，优先使用无边框或窗口化全屏
-- 如果修改的是脚本代码而不是纯配置，需要重启准心进程才能生效
+- MSTest `36/36` 通过
+
+## 已知限制
+
+- 目标游戏识别当前默认只包含 `DeltaForceClient-Win64-Shipping` 与 `delta_force_launcher`
+- 独占全屏下，Windows 叠加层仍可能不可见，优先使用无边框或窗口化全屏
+- 兼容脚本会提权，但 UAC 确认仍必须由桌面用户完成

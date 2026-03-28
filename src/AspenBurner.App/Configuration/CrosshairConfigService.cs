@@ -23,6 +23,21 @@ public sealed class CrosshairConfigService
     }
 
     /// <summary>
+    /// Loads configuration from disk, returning defaults when the file does not exist.
+    /// </summary>
+    public CrosshairConfig LoadFromFile(string path)
+    {
+        if (!File.Exists(path))
+        {
+            CrosshairConfig defaults = this.CreateDefault();
+            this.Validate(defaults);
+            return defaults;
+        }
+
+        return this.LoadFromJson(File.ReadAllText(path));
+    }
+
+    /// <summary>
     /// Loads and validates configuration from JSON text.
     /// </summary>
     /// <param name="json">Source JSON string.</param>
@@ -51,6 +66,20 @@ public sealed class CrosshairConfigService
     {
         this.Validate(config);
         return JsonSerializer.Serialize(config with { ConfigVersion = CrosshairConfigMigrator.CurrentVersion }, this.jsonOptions);
+    }
+
+    /// <summary>
+    /// Saves configuration atomically to disk.
+    /// </summary>
+    public void SaveToFile(string path, CrosshairConfig config)
+    {
+        string json = this.ToJson(config);
+        string directory = Path.GetDirectoryName(path) ?? throw new InvalidOperationException("Configuration path must have a directory.");
+        Directory.CreateDirectory(directory);
+
+        string tempPath = Path.Combine(directory, $"{Path.GetFileName(path)}.{Guid.NewGuid():N}.tmp");
+        File.WriteAllText(tempPath, json);
+        File.Move(tempPath, path, overwrite: true);
     }
 
     /// <summary>

@@ -1,16 +1,103 @@
+using System.Globalization;
+using System.Threading;
+using AspenBurner.App.Application;
+
 namespace AspenBurner.App;
 
-static class Program
+internal static class Program
 {
     /// <summary>
-    ///  The main entry point for the application.
+    /// Application entrypoint.
     /// </summary>
     [STAThread]
-    static void Main()
+    private static void Main(string[] args)
     {
-        // To customize application configuration such as set high DPI settings or default font,
-        // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
-    }    
+
+        (AppCommand? initialCommand, string configPath) = ParseArguments(args);
+        using Mutex mutex = new(initiallyOwned: true, AppIdentity.MutexName, out bool createdNew);
+
+        if (!createdNew)
+        {
+            AppCommand command = initialCommand ?? new AppCommand(AppCommandKind.Resume);
+            AppCommandClient client = new();
+            _ = client.TrySend(AppIdentity.PipeName, command);
+            return;
+        }
+
+        if (initialCommand?.Kind == AppCommandKind.Stop)
+        {
+            return;
+        }
+
+        AppCommand startupCommand = initialCommand ?? new AppCommand(AppCommandKind.Resume);
+        using AspenBurnerApplicationContext context = new(configPath, startupCommand);
+        global::System.Windows.Forms.Application.Run(context);
+    }
+
+    private static (AppCommand? Command, string ConfigPath) ParseArguments(string[] args)
+    {
+        AppCommand? command = null;
+        int previewSeconds = 8;
+        string configPath = GetDefaultConfigPath();
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            string argument = args[i].Trim();
+            switch (argument.ToLowerInvariant())
+            {
+                case "--config-path":
+                    configPath = Path.GetFullPath(args[++i]);
+                    break;
+                case "--command":
+                    command = ParseCommandValue(args[++i], previewSeconds);
+                    break;
+                case "--preview-seconds":
+                    previewSeconds = int.Parse(args[++i], CultureInfo.InvariantCulture);
+                    if (command?.Kind == AppCommandKind.Preview)
+                    {
+                        command = new AppCommand(AppCommandKind.Preview, previewSeconds);
+                    }
+
+                    break;
+                case "--show-settings":
+                    command = new AppCommand(AppCommandKind.ShowSettings);
+                    break;
+                case "--preview":
+                    command = new AppCommand(AppCommandKind.Preview, previewSeconds);
+                    break;
+                case "--stop":
+                    command = new AppCommand(AppCommandKind.Stop);
+                    break;
+                case "--start":
+                case "--resume":
+                    command = new AppCommand(AppCommandKind.Resume);
+                    break;
+            }
+        }
+
+        return (command, configPath);
+    }
+
+    private static AppCommand ParseCommandValue(string value, int previewSeconds)
+    {
+        return value.ToLowerInvariant() switch
+        {
+            "show-settings" => new AppCommand(AppCommandKind.ShowSettings),
+            "preview" => new AppCommand(AppCommandKind.Preview, previewSeconds),
+            "health" => new AppCommand(AppCommandKind.Health),
+            "resume" => new AppCommand(AppCommandKind.Resume),
+            "stop" => new AppCommand(AppCommandKind.Stop),
+            _ => throw new ArgumentException($"Unknown command argument: {value}", nameof(value)),
+        };
+    }
+
+    private static string GetDefaultConfigPath()
+    {
+        string localConfigPath = Path.Combine(AppContext.BaseDirectory, "config", "crosshair.json");
+        string parentConfigPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)?.FullName ?? AppContext.BaseDirectory, "config", "crosshair.json");
+        return File.Exists(localConfigPath) || Directory.Exists(Path.GetDirectoryName(localConfigPath)!)
+            ? localConfigPath
+            : parentConfigPath;
+    }
 }
