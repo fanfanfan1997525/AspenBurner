@@ -9,3 +9,5 @@
 - 20260328: 新增 `Resolve-PreferredCpuStatusSnapshot`，解决 vendor 时钟预热阶段暂时卡在基频时的回退合并逻辑。
 - 20260328: 当前实测 vendor 读数约为 `4218/74C`，与控制中心界面读数一致量级。
 - 20260328: 已触发一次 `Start-Crosshair.cmd`，是否真正接管管理员实例仍取决于桌面 UAC 确认。
+- 20260328: 已在 `F:\software\crosshair-overlay` 初始化本地 git 仓库，提交 `feat: initialize AspenBurner crosshair overlay tool`，并合并远端 `main` 的初始提交。
+- 20260328: 远端 `push` 仍阻塞在 GitHub 凭据认证，仓库内容已准备好，只差登录或 PAT。

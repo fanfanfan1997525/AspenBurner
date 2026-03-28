@@ -15,8 +15,10 @@
 - 20260328: 新增 Control Center vendor provider，角标现在优先读取控制中心真实 `Clock/Temperature/Usage`。
 - 20260328: 新增 `Resolve-PreferredCpuStatusSnapshot`，解决 vendor 预热阶段时钟短暂回落到基频的问题。
 - 20260328: Pester `46/46` 通过；`CrosshairOverlay.ps1` smoke run 通过。
+- 20260328: 已初始化本地 git 仓库、重写 `README.md`、完成本地提交并合并远端 `main` 历史。
 
 未完成
+- 20260328: 远端 `origin/main` 尚未推送成功，当前阻塞为 GitHub 认证。
 - 20260328: 需要用户在真实游戏场景下验证新版角标是否已显示真实温度，且无明显性能干扰。
 - 20260328: 若用户仍需更低开销方案，可继续研究直接调用 `InsydeDCHU`/控制中心初始化链，绕开 `CC40` 托管层。
 - 20260328: 若用户希望可视化切换数据源，可在设置面板加入 `Vendor / Fallback` 状态显示。
