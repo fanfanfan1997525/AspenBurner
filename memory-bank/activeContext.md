@@ -10,3 +10,5 @@
 - 20260328: 下一步若用户继续反馈“保存不生效”，先查是否仍在使用旧管理员实例或旧快捷方式。
 
 - 20260328: BIOS/EC research: matched Clevo NPxxSNx(-G) baseline, downloaded B10723 + EC10708, confirmed B10724 listing exists but source file is missing.
+
+- 20260329: Firmware rollback status: BIOS now 1.07.23 and EC 7.08, but Event 37 persists and Win32_Processor still reports 2100/2100 MHz; root cause not resolved by firmware version rollback alone.
