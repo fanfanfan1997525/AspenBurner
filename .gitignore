@@ -3,3 +3,12 @@ debug-screenshot.png
 *.log
 *.tmp
 *.bak
+.vs/
+.idea/
+.worktrees/
+src/**/bin/
+src/**/obj/
+tests/**/bin/
+tests/**/obj/
+artifacts/
+dist/
