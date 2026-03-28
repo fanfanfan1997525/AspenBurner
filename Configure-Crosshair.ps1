@@ -1,5 +1,5 @@
 param(
-    [string]$ConfigPath = (Join-Path $PSScriptRoot 'config\crosshair.json'),
+    [string]$ConfigPath = '',
     [int]$AutoCloseMs = 0,
     [switch]$Elevated
 )
@@ -10,7 +10,13 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'AspenBurner.Common.ps1')
 
 $launcherScript = [System.IO.Path]::GetFullPath($PSCommandPath)
-$resolvedConfigPath = [System.IO.Path]::GetFullPath($ConfigPath)
+$resolvedConfigInputPath = if ([string]::IsNullOrWhiteSpace($ConfigPath)) {
+    Join-Path $PSScriptRoot 'config\crosshair.json'
+}
+else {
+    $ConfigPath
+}
+$resolvedConfigPath = [System.IO.Path]::GetFullPath($resolvedConfigInputPath)
 
 if (-not $Elevated -and -not (Test-IsAdministrator)) {
     Start-ElevatedPowerShellScript -ScriptPath $launcherScript -ForwardArguments @(

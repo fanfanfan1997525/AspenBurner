@@ -95,9 +95,13 @@ internal static class Program
     private static string GetDefaultConfigPath()
     {
         string localConfigPath = Path.Combine(AppContext.BaseDirectory, "config", "crosshair.json");
-        string parentConfigPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)?.FullName ?? AppContext.BaseDirectory, "config", "crosshair.json");
+        string parentDirectory = Directory.GetParent(AppContext.BaseDirectory)?.FullName ?? AppContext.BaseDirectory;
+        string parentConfigPath = Path.Combine(parentDirectory, "config", "crosshair.json");
+        string grandParentConfigPath = Path.Combine(Directory.GetParent(parentDirectory)?.FullName ?? parentDirectory, "config", "crosshair.json");
         return File.Exists(localConfigPath) || Directory.Exists(Path.GetDirectoryName(localConfigPath)!)
             ? localConfigPath
-            : parentConfigPath;
+            : File.Exists(parentConfigPath) || Directory.Exists(Path.GetDirectoryName(parentConfigPath)!)
+                ? parentConfigPath
+                : grandParentConfigPath;
     }
 }

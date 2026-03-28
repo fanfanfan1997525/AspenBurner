@@ -13,9 +13,10 @@
   - overlay 运行时
   - CPU 遥测服务
   - 兼容 `Start/Configure/Stop` 脚本入口
+  - `AspenBurner.Cli.ps1/.cmd` 自动化入口
   - 日志落盘
 - 20260328: `dotnet test` 通过，发布物已生成到 `dist\AspenBurner`，本地 smoke 已通过。
+- 20260328: 已安装 `opencli`，并用 `resume/show-settings/preview/stop` 路径完成自审。
 
 未完成
-- 20260328: 需要安装 opencli，跑一轮模拟用户操作自审。
 - 20260328: 需要完成最终提交说明。

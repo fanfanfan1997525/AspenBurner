@@ -3,7 +3,7 @@
 版本: v0.5.0  
 日期: 2026-03-28
 
-AspenBurner 现在是一个专门的 Windows 桌面软件，不再以 PowerShell 透明窗脚本作为主运行时。当前主程序为 `dist\AspenBurner\AspenBurner.exe`，保留 `Start/Configure/Stop` 脚本与 `.cmd` 入口作为兼容壳层。
+AspenBurner 现在是一个专门的 Windows 桌面软件，不再以 PowerShell 透明窗脚本作为主运行时。当前主程序为 `dist\AspenBurner\AspenBurner.exe`，保留 `Start/Configure/Stop` 脚本与 `.cmd` 入口作为兼容壳层，同时提供 `AspenBurner.Cli.ps1/.cmd` 作为自动化与自验入口。
 
 ## 当前能力
 
@@ -17,6 +17,9 @@ AspenBurner 现在是一个专门的 Windows 桌面软件，不再以 PowerShell
   - `Start-Crosshair.cmd/.ps1`
   - `Configure-Crosshair.cmd/.ps1`
   - `Stop-Crosshair.cmd/.ps1`
+- 自动化入口：
+  - `AspenBurner.Cli.cmd`
+  - `AspenBurner.Cli.ps1`
 - 日志落盘到 `logs\`
 
 ## 目录
@@ -28,6 +31,7 @@ AspenBurner 现在是一个专门的 Windows 桌面软件，不再以 PowerShell
 - `Start-Crosshair.cmd/.ps1`: 启动/恢复显示
 - `Configure-Crosshair.cmd/.ps1`: 打开设置窗口
 - `Stop-Crosshair.cmd/.ps1`: 请求主程序退出
+- `AspenBurner.Cli.cmd/.ps1`: 自动化命令入口
 - `logs\`: 运行日志
 
 ## 使用
@@ -44,6 +48,15 @@ AspenBurner 现在是一个专门的 Windows 桌面软件，不再以 PowerShell
 .\dist\AspenBurner\AspenBurner.exe --config-path .\config\crosshair.json --resume
 .\dist\AspenBurner\AspenBurner.exe --config-path .\config\crosshair.json --show-settings
 .\dist\AspenBurner\AspenBurner.exe --stop
+```
+
+自动化命令入口：
+
+```powershell
+.\AspenBurner.Cli.ps1 start
+.\AspenBurner.Cli.ps1 configure
+.\AspenBurner.Cli.ps1 preview -PreviewSeconds 3
+.\AspenBurner.Cli.ps1 stop
 ```
 
 如果游戏以管理员权限运行，兼容脚本会请求 UAC 提权。需要你在桌面确认一次。
@@ -128,6 +141,8 @@ dotnet publish .\src\AspenBurner.App\AspenBurner.App.csproj -c Release -o .\dist
 当前自动化基线：
 
 - MSTest `36/36` 通过
+- 发布物 smoke 通过
+- `opencli` 路径自审通过：`resume -> show-settings -> preview -> stop`
 
 ## 已知限制
 
