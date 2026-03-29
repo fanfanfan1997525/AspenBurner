@@ -1,32 +1,18 @@
-# 椤圭洰杩涘害
-鐗堟湰: v0.5.3
+# 项目进度
+版本: v0.5.4
 
-宸插畬鎴?
-- 20260326: 寤虹珛鐙珛鍑嗗績宸ュ叿銆侀厤缃枃浠躲€佸惎鍔?鍋滄鑴氭湰鍜?memory-bank銆?
-- 20260327: 淇鏁村睆閫忔槑绐楀鑷寸殑榛戝睆涓庨棯鐑侊紝鏀逛负灏忓昂瀵?overlay锛屼粎鍦ㄧ洰鏍囨父鎴忓墠鍙版樉绀恒€?
-- 20260328: 瀹屾垚浜や簰寮忚缃潰鏉裤€丆PU 瑙掓爣銆佺湡瀹炴俯搴︿紭鍏堥摼璺€佷粨搴撳垵濮嬪寲涓庤繙绔彂甯冦€?
-- 20260328: 瀹屾垚 AspenBurner 妗岄潰鍖栭噸鏋勶紝浜や粯 WinForms 涓荤▼搴忋€佹墭鐩樸€佽缃獥銆佸吋瀹硅剼鏈拰 CLI銆?
-- 20260328: 瀹屾垚鍏煎鍏ュ彛鐑慨锛岃鐩栧弬鏁板吋瀹广€佸崟瀹炰緥閰嶇疆閲嶈浇鍜屽懡浠ら摼鍥炲綊娴嬭瘯銆?
-- 20260328: 瀹屾垚 Control Center 鐪熸俯搴︾儹淇紝澧炲姞杩愯搴撳畾浣嶅拰鏈湴缂撳瓨瑁呰浇銆?
-- 20260328: 瀹屾垚绋冲畾鎬т笌璁剧疆浣撻獙鐑慨锛屾柊澧炲叏灞€寮傚父鏃ュ織銆乼ick 闃插穿銆佹帹鑽愰璁俱€丷eset銆佽缃嵆鏃跺簲鐢ㄣ€?
-- 20260328: 楠岃瘉閫氳繃 `dotnet test` 54/54銆乣dotnet build -c Release` 鎴愬姛銆乣start -> preview -> stop` smoke 鎴愬姛銆?
+已完成
+- 20260326: 建立独立准心工具、配置文件、启动/停止脚本和 memory-bank。
+- 20260327: 修复整屏透明窗导致的黑屏与闪烁，改为小尺寸 overlay，仅在目标游戏前台显示。
+- 20260328: 完成交互式设置面板、CPU 角标、真实温度优先链路、仓库初始化与远端发布。
+- 20260328: 完成 AspenBurner 桌面化重构，交付 WinForms 主程序、托盘、设置窗、兼容脚本和 CLI。
+- 20260328: 完成兼容入口热修，覆盖参数兼容、单实例配置重载和命令链回归测试。
+- 20260328: 完成 Control Center 真温度热修，增加运行库定位和本地缓存装载。
+- 20260328: 完成稳定性与设置体验热修，新增全局异常日志、tick 防崩、推荐预设、Reset、设置即时应用。
+- 20260329: 完成 AspenBurner.Bench CPU 验证工具，并用于多组电源/风扇/模式对比。
+- 20260329: 新增 `AverageTemperatureC` 到 AspenBurner.Bench 遥测与报告链路，并通过全量测试。
+- 20260329: 创建并验证本地 skill `clevo-gaming-thermal-tuning`，可直接切 CC40 档位、切 Windows 电源方案并运行 bench。
 
-寰呰瀵?
-- 20260328: 鑻ョ敤鎴风户缁姤鍛婃父鎴忓唴涓嶆樉绀烘垨淇濆瓨鏃犳晥锛屼紭鍏堟帓鏌ユ槸鍚﹀瓨鍦ㄦ棫绠＄悊鍛樺疄渚嬫埅娴佸崟瀹炰緥鍛戒护銆?
-
-- 20260328: BIOS/EC investigation complete: Colorful HX public page has no BIOS, Clevo mirror B10723 and EC10708 downloaded, B10724 entry present but unavailable.
-
-- 20260329: Verified BIOS single-flash and EC update succeeded (BIOS 1.07.23, EC 7.08), but firmware throttling persists with fresh Event 37 and CPU capped at 2100 MHz.
-
-- 20260329: 完成 AspenBurner.Bench CPU 验证工具，新增 bench 项目、测试项目、两段负载场景、遥测采样、Event 37 探针和结论分类。
-- 20260329: Bench 全量测试通过，并完成本机 75s 正式验证，结果未出现新的 Event 37，当前机器在该工具下表现正常。
-
-
-- 20260329: Added comparison datapoint for Performance + custom fan + dGPU only; 75s bench remained normal with AvgFreq=3931MHz, PeakTemp=98C, Event37Delta=0.
-
-- 20260329: Added external-fan comparison datapoint; same profile stayed normal, with better FrameLoop P95 and multi-core throughput despite same 98C peak.
-
-- 20260329: Added real-game monitoring result for Delta Force under Performance + Maximum; stable clocks and no Event37, but CPU remained near 98C for most combat samples and FPS capture via PresentMon still failed.
-
-- 20260329: Added AverageTemperatureC to AspenBurner.Bench telemetry/report path and passed targeted bench tests for sampler/formatter/application.
-- 20260329: Created and validated local reusable skill clevo-gaming-thermal-tuning under C:\Users\Aspen\.codex\skills\; scripts now switch CC40 via verified AutomationIds, switch Windows power plans, and run AspenBurner.Bench.
+待观察
+- Delta Force 实战 FPS 直采仍缺 PresentMon 稳定链路，当前更依赖 CPU/GPU/温度/Event37 侧证据。
+- 若后续继续做温控优化，优先沿 skill 固化的档位矩阵继续，而不是重复从 BIOS/EC 学起。
