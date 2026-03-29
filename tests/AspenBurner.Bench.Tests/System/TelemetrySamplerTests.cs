@@ -17,6 +17,7 @@ public sealed class TelemetrySamplerTests
 
         Assert.AreEqual(2267, summary.AverageFrequencyMHz);
         Assert.AreEqual(2400, summary.MaxFrequencyMHz);
+        Assert.AreEqual(86.5, summary.AverageTemperatureC);
         Assert.AreEqual(88, summary.PeakTemperatureC);
         Assert.AreEqual(3, summary.SampleCount);
         Assert.AreEqual("Control Center", summary.Source);
@@ -29,6 +30,7 @@ public sealed class TelemetrySamplerTests
 
         Assert.AreEqual(0, summary.AverageFrequencyMHz);
         Assert.AreEqual(0, summary.MaxFrequencyMHz);
+        Assert.IsNull(summary.AverageTemperatureC);
         Assert.IsNull(summary.PeakTemperatureC);
         Assert.AreEqual(0, summary.SampleCount);
         Assert.AreEqual("Unavailable", summary.Source);

@@ -37,6 +37,7 @@ public static class ReportFormatter
         builder.AppendLine("Telemetry");
         builder.AppendLine($"  AverageFrequencyMHz: {report.Telemetry.AverageFrequencyMHz}");
         builder.AppendLine($"  MaxFrequencyMHz: {report.Telemetry.MaxFrequencyMHz}");
+        builder.AppendLine($"  AverageTemperatureC: {(report.Telemetry.AverageTemperatureC?.ToString("F0") ?? "--")}");
         builder.AppendLine($"  PeakTemperatureC: {(report.Telemetry.PeakTemperatureC?.ToString("F0") ?? "--")}");
         builder.AppendLine($"  Samples: {report.Telemetry.SampleCount}");
         builder.AppendLine($"  Source: {report.Telemetry.Source}");

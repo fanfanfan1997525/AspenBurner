@@ -13,7 +13,7 @@ public sealed class ReportFormatterTests
             LogicalCoreCount: 24,
             FrameLoop: new FrameLoopResult(3600, 8.10, 9.20, 11.40, 0.08, 125000),
             Parallel: new SustainedParallelResult(840000000, 21000000, 0.86),
-            Telemetry: new TelemetrySummary(2280, 2360, 96, 12, "Control Center"),
+            Telemetry: new TelemetrySummary(2280, 2360, 91.5, 96, 12, "Control Center"),
             Event37CountDelta: 3,
             Assessment: new BenchAssessment(
                 BenchOutcome.ClearlyAbnormal,
@@ -27,6 +27,7 @@ public sealed class ReportFormatterTests
         StringAssert.Contains(text, "平均频率长期偏低");
         StringAssert.Contains(text, "FrameLoop");
         StringAssert.Contains(text, "SustainedParallel");
+        StringAssert.Contains(text, "AverageTemperatureC: 92");
         StringAssert.Contains(text, "Event37Delta: 3");
     }
 }

@@ -13,7 +13,7 @@ public sealed class BenchApplicationTests
             24,
             new FrameLoopResult(3600, 8.0, 9.0, 10.0, 0.04, 120000),
             new SustainedParallelResult(800000000, 20000000, 0.90),
-            new TelemetrySummary(4200, 4500, 90, 10, "Control Center"),
+            new TelemetrySummary(4200, 4500, 88.5, 90, 10, "Control Center"),
             0,
             new BenchAssessment(BenchOutcome.Normal, "正常：未发现明显锁频证据。", []));
 

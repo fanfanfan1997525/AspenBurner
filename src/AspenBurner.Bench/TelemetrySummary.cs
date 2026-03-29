@@ -6,6 +6,7 @@ namespace AspenBurner.Bench;
 public sealed record TelemetrySummary(
     int AverageFrequencyMHz,
     int MaxFrequencyMHz,
+    double? AverageTemperatureC,
     double? PeakTemperatureC,
     int SampleCount,
     string Source);

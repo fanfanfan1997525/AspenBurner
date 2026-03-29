@@ -17,7 +17,7 @@ public static class TelemetrySampler
 
         if (samples.Count == 0)
         {
-            return new TelemetrySummary(0, 0, null, 0, "Unavailable");
+            return new TelemetrySummary(0, 0, null, null, 0, "Unavailable");
         }
 
         List<int> frequencies = samples
@@ -35,13 +35,14 @@ public static class TelemetrySampler
             ? 0
             : (int)Math.Round(frequencies.Average(), MidpointRounding.AwayFromZero);
         int maxFrequency = frequencies.Count == 0 ? 0 : frequencies.Max();
+        double? averageTemperature = temperatures.Count == 0 ? null : temperatures.Average();
         double? peakTemperature = temperatures.Count == 0 ? null : temperatures.Max();
         string source = samples
             .Select(static sample => sample.Source)
             .FirstOrDefault(static value => !string.IsNullOrWhiteSpace(value))
             ?? "Unavailable";
 
-        return new TelemetrySummary(averageFrequency, maxFrequency, peakTemperature, samples.Count, source);
+        return new TelemetrySummary(averageFrequency, maxFrequency, averageTemperature, peakTemperature, samples.Count, source);
     }
 
     /// <summary>
