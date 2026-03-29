@@ -33,3 +33,7 @@
   - 目标是 Windows 安装器 + portable zip + 远端 tag/release
   - 方案定为 Inno Setup + 自包含 publish
   - 兼容脚本需补“安装目录下直接找 AspenBurner.exe”
+- 20260329: v0.6.0 发布链已打通本地闭环：
+  - `Build-Release.ps1` 可产出 portable zip + installer exe
+  - 安装目录定为 `%LOCALAPPDATA%\\Programs\\AspenBurner`
+  - 静默安装、已安装目录直接启动、`--stop`、静默卸载 smoke 全通过
