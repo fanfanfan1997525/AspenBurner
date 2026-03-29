@@ -62,6 +62,12 @@ public sealed class StatusOverlayForm : Form
 
         if (changed)
         {
+            if (this.Visible)
+            {
+                this.Refresh();
+                return;
+            }
+
             this.Invalidate();
         }
     }

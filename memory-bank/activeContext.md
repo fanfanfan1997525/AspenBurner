@@ -25,3 +25,7 @@
   - 不改配置链路
   - 只修 `CrosshairOverlayForm` / `StatusOverlayForm` 的即时重绘语义
   - 先用 STA UI 测试把“可见窗体样式变化后立即重绘”钉成红灯
+- 20260329: 样式刷新 bug 已修复：
+  - `CrosshairOverlayForm.ApplyConfig(...)` 在可见态样式变化时改为同步重绘
+  - `StatusOverlayForm.ApplyStatus(...)` 在可见态样式变化时改为同步重绘
+  - 新增 UI 回归测试覆盖颜色/透明度类修改

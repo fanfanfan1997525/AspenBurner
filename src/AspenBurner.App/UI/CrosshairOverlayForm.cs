@@ -49,8 +49,22 @@ public sealed class CrosshairOverlayForm : Form
     /// </summary>
     public void ApplyConfig(CrosshairConfig nextConfig)
     {
+        bool changed = this.config != nextConfig ||
+                       this.crosshairColor.ToArgb() != ColorResolver.ResolveCrosshairColor(nextConfig).ToArgb();
         this.config = nextConfig ?? throw new ArgumentNullException(nameof(nextConfig));
         this.crosshairColor = ColorResolver.ResolveCrosshairColor(nextConfig);
+
+        if (!changed)
+        {
+            return;
+        }
+
+        if (this.Visible)
+        {
+            this.Refresh();
+            return;
+        }
+
         this.Invalidate();
     }
 
