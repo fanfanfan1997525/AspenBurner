@@ -79,6 +79,24 @@ public sealed class ThermalProfileControllerTests
     }
 
     /// <summary>
+    /// Ensures fallback state does not keep re-requesting profile C on every health tick.
+    /// </summary>
+    [TestMethod]
+    public void Reconcile_DoesNotRepeatCoolingRequestWhileAlreadyPaused()
+    {
+        ThermalProfileController controller = new();
+        _ = controller.Reconcile(CreateConfig(statusEnabled: true), CreateSnapshot(AppLifecycleState.Running, TargetWindowState.TargetMatched));
+        _ = controller.Reconcile(CreateConfig(statusEnabled: true), CreateSnapshot(AppLifecycleState.Paused, TargetWindowState.WaitingForTarget));
+
+        ThermalProfileDecision decision = controller.Reconcile(
+            CreateConfig(statusEnabled: true),
+            CreateSnapshot(AppLifecycleState.Paused, TargetWindowState.WaitingForTarget));
+
+        Assert.AreEqual(ThermalTimerCommand.None, decision.TimerCommand);
+        Assert.IsNull(decision.RequestedProfile);
+    }
+
+    /// <summary>
     /// Ensures the cadence tick promotes the system into the performance profile.
     /// </summary>
     [TestMethod]

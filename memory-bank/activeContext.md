@@ -7,9 +7,16 @@
   - A 档 = `高性能 + Performance + Maximum + dGPU only`，当前性能最强。
   - C 档 = `平衡 + Entertainment + Maximum + MSHybrid`，当前长期更凉。
   - B 档不再推荐；D 档仅用于诊断。
-- 20260329: 用户当前新需求是把 A/C 档联动集成进 AspenBurner：
-  - 手动开启准心 runtime 且 `StatusEnabled=true` 后，按 5 分钟节奏切/重申 A 档。
-  - 手动暂停/关闭准心，或关闭 CPU 角标时，立即切回 C 档。
-  - 不因 alt-tab、目标窗口短暂丢失而回 C。
-  - 仅在确认是这台 Clevo/Colorful 机器且具备可控能力时启用。
-- 20260329: 实现策略已统一为独立热管理状态机，不把切档逻辑塞进 `OverlayRuntime` 的 200ms tick。
+- 20260329: A/C 档联动已落地到 AspenBurner：
+  - `StatusEnabled=true` 且 runtime 为 `Running` 时，启动 5 分钟 cadence，按节奏切/重申 A 档。
+  - 手动 Pause / Stop，或关闭 CPU 角标时，立即回 C 档。
+  - alt-tab、等待目标窗口、短暂失焦不会回 C。
+  - 仅本机 `NP5x_6x_7x_SNx` + 可定位 CC40 + 可定位脚本时启用。
+- 20260329: 本轮修掉两个真实回归：
+  - 切档改为后台串行执行，避免 5 分钟 cadence / Pause 把 UI 卡在脚本调用上。
+  - fallback 状态去重，避免 `Paused` 时每个 health tick 都重复刷 C 档脚本。
+- 20260329: Release 实机 smoke 已验证：
+  - 先手动切 A
+  - 启动 `AspenBurner.exe`
+  - 命令管道 ready 后执行 `--stop`
+  - 结果成功回到 C（平衡 + Entertainment + FanMax + MSHybrid）

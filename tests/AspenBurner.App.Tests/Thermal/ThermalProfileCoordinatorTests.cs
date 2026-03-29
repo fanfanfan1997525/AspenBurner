@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AspenBurner.App.Configuration;
 using AspenBurner.App.Diagnostics;
 using AspenBurner.App.Runtime;
@@ -42,7 +43,7 @@ public sealed class ThermalProfileCoordinatorTests
         coordinator.UpdateHealth(CreateSnapshot(AppLifecycleState.Running, TargetWindowState.WaitingForTarget));
         timer.RaiseTick();
 
-        CollectionAssert.AreEqual(new[] { ThermalProfileKind.PerformanceA }, driver.AppliedProfiles);
+        Assert.IsTrue(SpinWait.SpinUntil(() => driver.AppliedProfiles.SequenceEqual([ThermalProfileKind.PerformanceA]), TimeSpan.FromSeconds(3)));
     }
 
     /// <summary>
@@ -60,7 +61,7 @@ public sealed class ThermalProfileCoordinatorTests
         coordinator.UpdateHealth(CreateSnapshot(AppLifecycleState.Paused, TargetWindowState.WaitingForTarget));
 
         Assert.AreEqual(1, timer.StopCalls);
-        CollectionAssert.Contains(driver.AppliedProfiles, ThermalProfileKind.CoolingC);
+        Assert.IsTrue(SpinWait.SpinUntil(() => driver.AppliedProfiles.Contains(ThermalProfileKind.CoolingC), TimeSpan.FromSeconds(3)));
     }
 
     /// <summary>
@@ -95,10 +96,31 @@ public sealed class ThermalProfileCoordinatorTests
         coordinator.UpdateHealth(CreateSnapshot(AppLifecycleState.Running, TargetWindowState.TargetMatched));
         coordinator.Shutdown();
 
-        CollectionAssert.Contains(driver.AppliedProfiles, ThermalProfileKind.CoolingC);
+        Assert.IsTrue(SpinWait.SpinUntil(() => driver.AppliedProfiles.Contains(ThermalProfileKind.CoolingC), TimeSpan.FromSeconds(3)));
     }
 
-    private static ThermalProfileCoordinator CreateCoordinator(FakeThermalProfileDriver driver, FakeThermalCadenceTimer timer)
+    /// <summary>
+    /// Ensures the five-minute cadence does not freeze the UI thread while the driver runs.
+    /// </summary>
+    [TestMethod]
+    public void CadenceTick_DoesNotBlockCallerWhenDriverIsSlow()
+    {
+        FakeThermalCadenceTimer timer = new();
+        SlowThermalProfileDriver driver = new();
+        using ThermalProfileCoordinator coordinator = CreateCoordinator(driver, timer);
+
+        coordinator.UpdateConfig(new CrosshairConfig { StatusEnabled = true });
+        coordinator.UpdateHealth(CreateSnapshot(AppLifecycleState.Running, TargetWindowState.WaitingForTarget));
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        timer.RaiseTick();
+        stopwatch.Stop();
+
+        Assert.IsTrue(stopwatch.Elapsed < TimeSpan.FromMilliseconds(500), $"Cadence tick blocked for {stopwatch.Elapsed}.");
+        Assert.IsTrue(SpinWait.SpinUntil(() => driver.AppliedProfiles.Contains(ThermalProfileKind.PerformanceA), TimeSpan.FromSeconds(3)));
+    }
+
+    private static ThermalProfileCoordinator CreateCoordinator(IThermalProfileDriver driver, FakeThermalCadenceTimer timer)
     {
         string logDirectory = Path.Combine(Path.GetTempPath(), "AspenBurner.Tests", Guid.NewGuid().ToString("N"));
         return new ThermalProfileCoordinator(new AppLogger(logDirectory), driver, timer);
@@ -164,6 +186,21 @@ public sealed class ThermalProfileCoordinatorTests
         {
             this.Enabled = false;
             this.StopCalls++;
+        }
+    }
+
+    private sealed class SlowThermalProfileDriver : IThermalProfileDriver
+    {
+        public bool IsSupported => true;
+
+        public List<ThermalProfileKind> AppliedProfiles { get; } = [];
+
+        public bool TryApply(ThermalProfileKind profile, out string message)
+        {
+            Thread.Sleep(1500);
+            this.AppliedProfiles.Add(profile);
+            message = "ok";
+            return true;
         }
     }
 }

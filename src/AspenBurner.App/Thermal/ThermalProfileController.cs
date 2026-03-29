@@ -24,8 +24,11 @@ public sealed class ThermalProfileController
 
         if (RequiresCoolingFallback(snapshot, config))
         {
+            ThermalTimerCommand timerCommand = this.cadenceRunning ? ThermalTimerCommand.Stop : ThermalTimerCommand.None;
             this.cadenceRunning = false;
-            return this.Request(ThermalTimerCommand.Stop, ThermalProfileKind.CoolingC);
+            return this.lastRequestedProfile == ThermalProfileKind.CoolingC
+                ? this.Request(timerCommand, null)
+                : this.Request(timerCommand, ThermalProfileKind.CoolingC);
         }
 
         if (IsPromotionEligible(snapshot, config))

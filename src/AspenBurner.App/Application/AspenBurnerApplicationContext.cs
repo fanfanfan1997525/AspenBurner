@@ -3,6 +3,7 @@ using AspenBurner.App.Configuration;
 using AspenBurner.App.Diagnostics;
 using AspenBurner.App.Runtime;
 using AspenBurner.App.Telemetry;
+using AspenBurner.App.Thermal;
 using AspenBurner.App.UI;
 
 namespace AspenBurner.App.Application;
@@ -19,6 +20,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
     private readonly SettingsForm settingsForm;
     private readonly NotifyIcon notifyIcon;
     private readonly AppCommandServer commandServer;
+    private readonly ThermalProfileCoordinator thermalProfileCoordinator;
     private readonly System.Windows.Forms.Timer saveTimer;
     private readonly ToolStripMenuItem lifecycleMenuItem;
     private readonly ToolStripMenuItem targetMenuItem;
@@ -56,6 +58,11 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
 
         CpuStatusService cpuStatusService = new(new ControlCenterCpuStatusProvider(), new FallbackCpuStatusProvider());
         this.overlayRuntime = new OverlayRuntime(this.logger, new ForegroundWindowSource(), cpuStatusService);
+        this.thermalProfileCoordinator = new ThermalProfileCoordinator(
+            this.logger,
+            new ClevoThermalProfileDriver(),
+            new WinFormsThermalCadenceTimer());
+        this.thermalProfileCoordinator.UpdateConfig(this.currentConfig);
 
         this.settingsForm = new SettingsForm();
         this.settingsForm.SetConfig(this.currentConfig);
@@ -147,6 +154,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
         this.commandServer.Dispose();
         this.saveTimer.Stop();
         this.SaveCurrentConfig("退出前已保存配置。");
+        this.thermalProfileCoordinator.Shutdown();
 
         this.notifyIcon.Visible = false;
         this.notifyIcon.Dispose();
@@ -156,6 +164,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
         this.settingsForm.Dispose();
 
         this.overlayRuntime.Dispose();
+        this.thermalProfileCoordinator.Dispose();
         this.uiInvoker.Dispose();
 
         base.ExitThreadCore();
@@ -201,6 +210,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
     private void OnConfigEdited(object? sender, CrosshairConfig config)
     {
         this.currentConfig = config;
+        this.thermalProfileCoordinator.UpdateConfig(config);
         this.overlayRuntime.UpdateConfig(config);
         this.saveTimer.Stop();
         this.saveTimer.Start();
@@ -232,6 +242,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
     {
         this.UpdateTrayFromHealth(snapshot);
         this.settingsForm.UpdateHealth(snapshot);
+        this.thermalProfileCoordinator.UpdateHealth(snapshot);
     }
 
     private void SaveCurrentConfig(string successMessage)
@@ -263,6 +274,7 @@ public sealed class AspenBurnerApplicationContext : global::System.Windows.Forms
 
             this.configPath = resolvedConfigPath;
             this.currentConfig = loadedConfig;
+            this.thermalProfileCoordinator.UpdateConfig(loadedConfig);
             this.overlayRuntime.UpdateConfig(loadedConfig);
             this.settingsForm.SetConfig(loadedConfig);
             this.logger.Info($"Configuration reloaded from {resolvedConfigPath}.");

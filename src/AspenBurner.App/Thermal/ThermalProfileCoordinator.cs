@@ -14,6 +14,7 @@ public sealed class ThermalProfileCoordinator : IDisposable
     private readonly IThermalProfileDriver driver;
     private readonly IThermalCadenceTimer timer;
     private readonly ThermalProfileController controller = new();
+    private readonly SemaphoreSlim applySemaphore = new(1, 1);
     private CrosshairConfig currentConfig = new();
     private bool disposed;
 
@@ -74,6 +75,7 @@ public sealed class ThermalProfileCoordinator : IDisposable
         this.disposed = true;
         this.timer.Tick -= this.OnCadenceTick;
         this.timer.Dispose();
+        this.applySemaphore.Dispose();
     }
 
     private void OnCadenceTick(object? sender, EventArgs e)
@@ -104,13 +106,33 @@ public sealed class ThermalProfileCoordinator : IDisposable
             return;
         }
 
-        if (this.driver.TryApply(profile, out string message))
+        _ = Task.Run(() => this.ApplyProfileAsync(profile));
+    }
+
+    private async Task ApplyProfileAsync(ThermalProfileKind profile)
+    {
+        try
         {
-            this.logger.Info($"Thermal profile applied: {profile}. {message}");
+            await this.applySemaphore.WaitAsync().ConfigureAwait(false);
+            if (this.driver.TryApply(profile, out string message))
+            {
+                this.logger.Info($"Thermal profile applied: {profile}. {message}");
+            }
+            else
+            {
+                this.logger.Info($"Thermal profile apply skipped/failed: {profile}. {message}");
+            }
         }
-        else
+        catch (Exception exception)
         {
-            this.logger.Info($"Thermal profile apply skipped/failed: {profile}. {message}");
+            this.logger.Error($"Thermal profile apply crashed: {profile}.", exception);
+        }
+        finally
+        {
+            if (!this.disposed)
+            {
+                this.applySemaphore.Release();
+            }
         }
     }
 }

@@ -12,13 +12,11 @@
 - 20260329: 创建并验证本地 skill `clevo-gaming-thermal-tuning`，可直连 CC40、电源方案和 bench。
 - 20260329: 完成 A/B/C/D 四组本机热管理档对比，当前统一结论为：A 性能最强，C 长期更稳。
 
-进行中
-- 20260329: 把 A/C 热管理档联动集成进 AspenBurner：
-  - 5 分钟晋升 A 档
-  - 手动关闭立即回 C 档
-  - 机型/能力门禁
-  - 不干扰现有 overlay 渲染与前台检测
-
 待观察
 - Delta Force 真实 FPS 直采仍缺稳定 PresentMon 链路，当前主要依赖 CPU/GPU/温度/Event37 侧证据。
 - 若联动功能落地后仍有体验问题，优先继续沿状态机和机型门禁收敛，而不是往 `OverlayRuntime` 再打补丁。
+- 20260329: 已完成准心联动 A/C 热管理档：
+  - 新增 `ThermalProfileController / Coordinator / Driver`
+  - 新增本机门禁、脚本定位、5 分钟 cadence、后台串行 apply
+  - 新增 20+ 条热管理相关测试
+  - Release 实机验证通过，`--stop` 可把 A 拉回 C
