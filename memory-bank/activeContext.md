@@ -20,3 +20,8 @@
   - 启动 `AspenBurner.exe`
   - 命令管道 ready 后执行 `--stop`
   - 结果成功回到 C（平衡 + Entertainment + FanMax + MSHybrid）
+- 20260329: 新收到一个准心回归：设置面板改 `颜色 / 透明度` 这类非几何参数时，预览会变，但真实 overlay 有时不跟着变。
+- 20260329: 当前修复策略已统一为最小方案：
+  - 不改配置链路
+  - 只修 `CrosshairOverlayForm` / `StatusOverlayForm` 的即时重绘语义
+  - 先用 STA UI 测试把“可见窗体样式变化后立即重绘”钉成红灯
