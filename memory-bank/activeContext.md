@@ -29,3 +29,7 @@
   - `CrosshairOverlayForm.ApplyConfig(...)` 在可见态样式变化时改为同步重绘
   - `StatusOverlayForm.ApplyStatus(...)` 在可见态样式变化时改为同步重绘
   - 新增 UI 回归测试覆盖颜色/透明度类修改
+- 20260329: 正在做 v0.6.0 发布链补全：
+  - 目标是 Windows 安装器 + portable zip + 远端 tag/release
+  - 方案定为 Inno Setup + 自包含 publish
+  - 兼容脚本需补“安装目录下直接找 AspenBurner.exe”
