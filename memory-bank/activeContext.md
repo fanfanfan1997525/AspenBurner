@@ -1,13 +1,15 @@
 # 当前上下文
-版本: v0.5.4
+版本: v0.5.5
 
-- 20260328: AspenBurner 已完成桌面化，包含托盘、设置面板、兼容脚本、CLI 与真实 CPU 遥测链路。
-- 20260328: Overlay 侧已完成稳定性修复：异常日志、tick 防崩、设置即时应用、推荐预设、Reset。
-- 20260328: 固件排查已做过 BIOS/EC 回刷；当前 BIOS=1.07.23、EC=7.08，但系统层 Event37 问题已在 bench 中不再复现。
-- 20260329: AspenBurner.Bench 已成为 CPU/热行为验证工具，覆盖帧循环、多核吞吐、Control Center 遥测与 Event37。
-- 20260329: Bench 新增 `AverageTemperatureC` 输出，当前全量测试通过。
-- 20260329: 已沉淀本机调优 skill：`C:\Users\Aspen\.codex\skills\clevo-gaming-thermal-tuning\`。
-- 20260329: skill 已实机验证可切 CC40 档位、切 Windows 电源方案、运行 AspenBurner.Bench。
-- 20260329: 当前推荐游戏默认档：`HighPerformance + Entertainment + Custom`。
-- 20260329: 当前推荐极限降温档：`Balanced + Entertainment + Maximum`。
-- 20260329: 当前推荐锁频排查档：`Aspen Safe Gaming(3600) + Entertainment + Maximum`。
+- 20260329: AspenBurner 已完成桌面化、设置面板、托盘、CLI、兼容脚本、CPU 遥测与 Bench 工具。
+- 20260329: 已固化本机调优 skill `C:\Users\Aspen\.codex\skills\clevo-gaming-thermal-tuning\`，可切 CC40、电源方案并跑 bench。
+- 20260329: 最新 bench 结论已统一：
+  - A 档 = `高性能 + Performance + Maximum + dGPU only`，当前性能最强。
+  - C 档 = `平衡 + Entertainment + Maximum + MSHybrid`，当前长期更凉。
+  - B 档不再推荐；D 档仅用于诊断。
+- 20260329: 用户当前新需求是把 A/C 档联动集成进 AspenBurner：
+  - 手动开启准心 runtime 且 `StatusEnabled=true` 后，按 5 分钟节奏切/重申 A 档。
+  - 手动暂停/关闭准心，或关闭 CPU 角标时，立即切回 C 档。
+  - 不因 alt-tab、目标窗口短暂丢失而回 C。
+  - 仅在确认是这台 Clevo/Colorful 机器且具备可控能力时启用。
+- 20260329: 实现策略已统一为独立热管理状态机，不把切档逻辑塞进 `OverlayRuntime` 的 200ms tick。
